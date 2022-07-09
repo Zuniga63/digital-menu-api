@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
-import UserModel from '../models/User.model';
+import bcrypt from 'bcryptjs';
+import UserModel, { IUser } from '../models/User.model';
 import createToken from '../utils/createToken';
 import { sendRegisterMail } from '../utils/mailer';
 import sendError from '../utils/sendError';
+import InvalidSignInError from '../utils/errors/InvalidSignInError';
 
 export async function signUp(req: Request, res: Response): Promise<void> {
   try {
@@ -20,6 +22,21 @@ export async function signUp(req: Request, res: Response): Promise<void> {
   }
 }
 
-export async function signIn(_req: Request, _res: Response): Promise<void> {
-  //
+export async function signIn(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password }: { email: string; password: string } = req.body;
+    const message: string = 'Correo o contraseña invalidos.';
+
+    const user: IUser | null = await UserModel.findOne({ email });
+    if (!user) throw new InvalidSignInError(message);
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) throw new InvalidSignInError(message);
+
+    const token = createToken({ id: user.id });
+
+    res.status(200).json({ ok: true, token });
+  } catch (error) {
+    sendError(error, res);
+  }
 }
