@@ -26,14 +26,25 @@ export default function sendError(error: any, res: Response) {
     ok: false,
   };
 
-  if (errorName === 'ValidationError' || errorName === 'InvalidSignInError') {
-    info.message = 'Error de validación';
-    info.validationErrors = error.errors;
-    code = 400;
-  } else if (errorName === 'AuthError') code = 401;
-  else if (errorName === 'NotFoundError') code = 404;
-  // eslint-disable-next-line no-console
-  else console.log(error);
+  switch (errorName) {
+    case 'InvalidSignInError':
+      code = 400;
+      break;
+    case 'ValidationError':
+      info.message = 'Error de validación';
+      code = 400;
+      break;
+    case 'AuthError':
+      code = 401;
+      break;
+    case 'NotFoundError':
+      code = 404;
+      break;
+    default:
+      // eslint-disable-next-line no-console
+      console.log(error);
+      break;
+  }
 
   res.status(code).json(info);
 }
