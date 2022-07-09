@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { emailRegex, strongPass } from '../utils/uitils';
 
 export interface IUser {
+  id?: string;
   name: string;
   email: string;
   emailVerifiedAt?: string | Date;
