@@ -6,10 +6,15 @@ import sendError from '../utils/sendError';
 
 export async function signUp(req: Request, res: Response): Promise<void> {
   try {
-    const user = await UserModel.create({ ...req.body });
+    // the first user is the admin of platform
+    const userCount = await UserModel.count();
+    const role = userCount ? 'USER' : 'ADMIN';
+
+    const user = await UserModel.create({ ...req.body, role });
     const token = createToken({ id: user.id });
-    const mailInfo = await sendRegisterMail(user);
-    res.status(201).json({ token, user, mailInfo });
+    await sendRegisterMail(user);
+
+    res.status(201).json({ token, ok: true });
   } catch (error) {
     sendError(error, res);
   }
