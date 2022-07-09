@@ -12,6 +12,5 @@ export default function createToken(
 ): string {
   const secretKey: string = process.env.JWT_SECRET_KEY || 'secretKey';
   const expiresIn: number = duration || 60 * 60 * 24;
-
   return jwt.sign(payload, secretKey, { expiresIn });
 }
