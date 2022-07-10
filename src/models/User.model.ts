@@ -1,6 +1,6 @@
 import { Schema, model, Types, models, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { emailRegex, strongPass } from '../utils/uitils';
+import { emailRegex, IImage, strongPass } from '../utils/uitils';
 
 export interface IUser {
   id?: string;
@@ -9,7 +9,7 @@ export interface IUser {
   emailVerifiedAt?: string | Date;
   password: string;
   rememberToken?: string;
-  profilePhoto?: object;
+  profilePhoto?: IImage;
   role?: string;
   orders: Types.ObjectId[];
 }
