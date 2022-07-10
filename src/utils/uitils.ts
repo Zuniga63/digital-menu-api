@@ -17,3 +17,12 @@ export const createSlug = (text: string) =>
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
     : '';
+
+export interface IImage {
+  publicId?: string;
+  width?: number;
+  height?: number;
+  format?: string;
+  type?: string;
+  url?: string;
+}
