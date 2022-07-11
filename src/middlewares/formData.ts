@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import busboy from 'busboy';
 import dotenv from 'dotenv';
 import { nanoid } from 'nanoid';
-import { createSlug } from '../utils/uitils';
+import { createSlug, IImage } from '../utils/uitils';
 
 dotenv.config();
 cloudinary.config({
@@ -19,10 +19,23 @@ const PRESETS = {
   optionsItem: 'option_item_preset',
 };
 
+export const destroyResource = async (publicId?: string) => {
+  try {
+    if (publicId) {
+      const cloudRes = await cloudinary.uploader.destroy(publicId);
+      return cloudRes;
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error);
+  }
+  return { result: 'failed' };
+};
+
 const formData = (req: Request, _res: Response, next: NextFunction) => {
   const body: { [key: string]: any } = {};
   const bb = busboy({ headers: req.headers });
-  const { path } = req;
+  const { originalUrl } = req;
 
   // vars for controller the upload of files
   let uploadingFile = false;
@@ -57,10 +70,11 @@ const formData = (req: Request, _res: Response, next: NextFunction) => {
     uploadingFile = true;
     uploadingCount += 1;
 
-    if (path.includes('users')) preset = PRESETS.profilePhoto;
-    else if (path.includes('categories')) preset = PRESETS.category;
-    else if (path.includes('products')) preset = PRESETS.product;
-    else if (path.includes('option-sets')) preset = PRESETS.optionsItem;
+    // console.log(originalUrl);
+    if (originalUrl.includes('users')) preset = PRESETS.profilePhoto;
+    else if (originalUrl.includes('categories')) preset = PRESETS.category;
+    else if (originalUrl.includes('products')) preset = PRESETS.product;
+    else if (originalUrl.includes('option-sets')) preset = PRESETS.optionsItem;
 
     options.upload_preset = preset;
     options.resource_type = fileType;
@@ -69,6 +83,7 @@ const formData = (req: Request, _res: Response, next: NextFunction) => {
       const id = nanoid(10);
 
       options.public_id = `${name}-${id}`;
+      // options.public_id = `${name}`;
     }
 
     const cloud = cloudinary.uploader.upload_stream(
@@ -87,7 +102,7 @@ const formData = (req: Request, _res: Response, next: NextFunction) => {
             resource_type: type,
             secure_url: url,
           } = cloudRes;
-          body[key] = { publicId, width, height, format, type, url };
+          body[key] = { publicId, width, height, format, type, url } as IImage;
         }
 
         uploadingFile = false;

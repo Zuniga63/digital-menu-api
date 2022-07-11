@@ -32,6 +32,7 @@ export default function sendError(error: any, res: Response) {
       break;
     case 'ValidationError':
       info.message = 'Error de validación';
+      info.validationErrors = error.errors;
       code = 400;
       break;
     case 'AuthError':
