@@ -1,11 +1,5 @@
 import { Response } from 'express';
-
-export interface IErrorInfo {
-  message: string;
-  ok: boolean;
-  error?: any;
-  validationErrors?: object;
-}
+import ResponseInfo from './ResponseInfo';
 /**
  * Response Code
  * 400: Bad Request
@@ -21,10 +15,7 @@ export interface IErrorInfo {
 export default function sendError(error: any, res: Response) {
   const { name: errorName, message }: { name: string; message: string } = error;
   let code: number = 500;
-  const info: IErrorInfo = {
-    message,
-    ok: false,
-  };
+  const info = new ResponseInfo(message);
 
   switch (errorName) {
     case 'InvalidSignInError':
