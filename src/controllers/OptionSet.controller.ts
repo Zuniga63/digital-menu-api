@@ -22,8 +22,8 @@ interface IStoreSet {
 
 export async function list(_req: Request, res: Response) {
   try {
-    const optionsSets = await OptionSetModel.find({}).populate('items');
-    res.status(200).json({ ok: true, optionsSets });
+    const optionSets = await OptionSetModel.find({}).populate('items');
+    res.status(200).json({ ok: true, optionSets });
   } catch (error) {
     sendError(error, res);
   }
