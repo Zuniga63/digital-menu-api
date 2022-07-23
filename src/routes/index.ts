@@ -9,6 +9,6 @@ const rootRouter = Router();
 rootRouter.use('/auth', AuthRouter);
 rootRouter.use('/product-categories', ProductCategoryRouter);
 rootRouter.use('/products', ProductRouter);
-rootRouter.use('/set-options', OptionSetRouter);
+rootRouter.use('/option-sets', OptionSetRouter);
 
 export default rootRouter;
