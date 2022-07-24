@@ -29,6 +29,26 @@ export async function list(_req: Request, res: Response) {
   }
 }
 
+export async function home(_req: Request, res: Response) {
+  try {
+    const categories = await ProductCategoryModel.find({})
+      .sort('order')
+      .populate({
+        path: 'products',
+        populate: {
+          path: 'optionSets',
+          populate: {
+            path: 'items',
+            populate: 'optionSetItem',
+          },
+        },
+      });
+    res.status(200).json({ ok: true, categories });
+  } catch (error) {
+    sendError(error, res);
+  }
+}
+
 /**
  * This method recover one category of products.
  * @param req
