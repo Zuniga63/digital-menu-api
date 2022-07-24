@@ -4,6 +4,8 @@ import { createSlug, IImage } from '../utils/uitils';
 export interface IProduct {
   id?: string;
   category?: Types.ObjectId;
+  optionSets: Types.ObjectId[];
+  optionSetItems: Types.ObjectId[];
   name: string;
   slug: string;
   description?: string;
@@ -37,6 +39,10 @@ const schema = new Schema<IProduct>(
         },
       ],
     },
+    optionSets: [{ type: Schema.Types.ObjectId, ref: 'ProductHasOptionSet' }],
+    optionSetItems: [
+      { type: Schema.Types.ObjectId, ref: 'ProductHasOptionSetItem' },
+    ],
     name: {
       type: String,
       minlength: [3, 'Debe tener minimo 3 caracteres.'],

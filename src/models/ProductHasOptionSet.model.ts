@@ -3,6 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 export interface IProductHasOptionSet {
   product: Types.ObjectId;
   optionSet: Types.ObjectId;
+  items: Types.ObjectId[];
   title: string;
   required: boolean;
   multiple: boolean;
@@ -22,6 +23,7 @@ const schema = new Schema<IProductHasOptionSet>(
       ref: 'OptionSet',
       required: [true, 'Se requiere asignar un set de opciones'],
     },
+    items: [{ type: Schema.Types.ObjectId, ref: 'ProductHasOptionSetItem' }],
     title: {
       type: String,
       minlength: [3, 'Debe tener minimo 3 caracteres.'],
