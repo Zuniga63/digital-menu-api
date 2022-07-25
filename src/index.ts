@@ -1,21 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
-
-// add express instance
-const app = express();
-
-// add midlewares
-app.use(express.json());
-app.use(cors());
-app.use(morgan('dev'));
-
-const port: string = '8080';
-const host: string = 'http://localhost';
+import app from './app';
+import { verify } from './utils/mailer';
 
 // start server
-app.listen(port, (): void => {
-  const url = `${host}:${port}`;
+app.listen(app.get('port'), async (): Promise<void> => {
   // eslint-disable-next-line no-console
-  console.log(`Server is running in: ${url}`);
+  console.log(`Server is running on: ${app.get('host')}`);
+  if (await verify()) {
+    // eslint-disable-next-line no-console
+    console.log('Mail server is running');
+  }
 });
