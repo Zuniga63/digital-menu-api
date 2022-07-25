@@ -16,7 +16,14 @@ export async function signUp(req: Request, res: Response): Promise<void> {
     const token = createToken({ id: user.id });
     await sendRegisterMail(user);
 
-    res.status(201).json({ token, ok: true });
+    const userData = {
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.profilePhoto,
+      role: user.role,
+    };
+
+    res.status(201).json({ token, ok: true, user: userData });
   } catch (error) {
     sendError(error, res);
   }
@@ -35,7 +42,14 @@ export async function signIn(req: Request, res: Response): Promise<void> {
 
     const token = createToken({ id: user.id });
 
-    res.status(200).json({ ok: true, token });
+    const userData = {
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.profilePhoto,
+      role: user.role,
+    };
+
+    res.status(200).json({ ok: true, token, user: userData });
   } catch (error) {
     sendError(error, res);
   }
