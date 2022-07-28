@@ -12,7 +12,7 @@ interface IStore {
   description?: string;
   image?: IImage;
   order?: number;
-  isEnabled?: boolean;
+  isEnabled?: string;
 }
 
 /**
@@ -119,7 +119,7 @@ export async function update(req: Request, res: Response) {
 
     // update rest
     category.description = description;
-    category.isEnabled = !!isEnabled;
+    category.isEnabled = isEnabled ? isEnabled === 'true' : false;
 
     await category.save({ validateModifiedOnly: true });
 
