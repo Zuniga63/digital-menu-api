@@ -1,4 +1,5 @@
-import { Schema, model, Types, models } from 'mongoose';
+import { Schema, model, Types, models, Model } from 'mongoose';
+import OptionSetItemModel from './OptionSetItem.model';
 
 export interface IOptionSet {
   id?: string;
@@ -7,7 +8,7 @@ export interface IOptionSet {
   isEnabled: boolean;
 }
 
-const schema = new Schema<IOptionSet>(
+const schema = new Schema<IOptionSet, Model<IOptionSet, {}>>(
   {
     name: {
       type: String,
@@ -40,4 +41,13 @@ const schema = new Schema<IOptionSet>(
   { timestamps: true }
 );
 
-export default model<IOptionSet>('OptionSet', schema);
+schema.pre('deleteOne', { document: true }, async function preDeleteOne() {
+  await OptionSetItemModel.deleteMany({ optionSet: this._id });
+});
+
+schema.pre(['findOneAndDelete', 'deleteMany'], async function preQuery() {
+  const { _id } = this.getFilter();
+  if (_id) await OptionSetItemModel.deleteMany({ optionSet: _id });
+});
+
+export default model<IOptionSet, Model<IOptionSet>>('OptionSet', schema);

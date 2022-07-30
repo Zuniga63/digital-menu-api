@@ -8,7 +8,7 @@ export default class ResponseInfo {
 
   error?: any;
 
-  validationErrors?: object;
+  validationErrors?: {};
 
   warnings: string[];
 

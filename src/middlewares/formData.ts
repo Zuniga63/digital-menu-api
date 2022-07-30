@@ -79,7 +79,7 @@ const formData = (req: Request, _res: Response, next: NextFunction) => {
     options.upload_preset = preset;
     options.resource_type = fileType;
     if (body.name) {
-      const name = createSlug(body.name);
+      const name = encodeURIComponent(createSlug(body.name));
       const id = nanoid(10);
 
       options.public_id = `${name}-${id}`;
