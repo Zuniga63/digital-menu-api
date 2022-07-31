@@ -3,9 +3,7 @@ import { Request, Response } from 'express';
 import { HydratedDocument } from 'mongoose';
 import { destroyResource } from '../middlewares/formData';
 import OptionSetModel, { IOptionSet } from '../models/OptionSet.model';
-import OptionSetItemModel, {
-  IOptionSetItem,
-} from '../models/OptionSetItem.model';
+import OptionSetItemModel, { IOptionSetItem } from '../models/OptionSetItem.model';
 import ProductOptionSetModel from '../models/ProductOptionSet.model';
 import NotFoundError from '../utils/errors/NotFoundError';
 import sendError from '../utils/sendError';
@@ -189,10 +187,7 @@ export async function sortItems(req: Request, res: Response) {
   try {
     await Promise.all(
       ids.map(async (id, index) => {
-        await OptionSetItemModel.updateOne(
-          { optionSet: setId, _id: id },
-          { order: index + 1 }
-        );
+        await OptionSetItemModel.updateOne({ optionSet: setId, _id: id }, { order: index + 1 });
       })
     );
 
@@ -205,8 +200,7 @@ export async function sortItems(req: Request, res: Response) {
 export async function destroy(req: Request, res: Response) {
   const { setId } = req.params;
   try {
-    const optionSet: HydratedDocument<IOptionSet> | null =
-      await OptionSetModel.findByIdAndDelete(setId);
+    const optionSet: HydratedDocument<IOptionSet> | null = await OptionSetModel.findByIdAndDelete(setId);
 
     if (!optionSet) throw new NotFoundError('Set de opciones no encontrado.');
     res.status(200).json({ ok: true, optionSet });
@@ -267,8 +261,7 @@ export async function updateOptionSetItem(req: Request, res: Response) {
   try {
     const optionItem = await OptionSetItemModel.findById(itemId);
 
-    if (!optionItem)
-      throw new NotFoundError('El item no existe o fue eliminado.');
+    if (!optionItem) throw new NotFoundError('El item no existe o fue eliminado.');
 
     lastImage = optionItem.image;
 
@@ -294,8 +287,7 @@ export async function enabledOptionSetItem(req: Request, res: Response) {
   const { itemId } = req.params;
   try {
     const optionItem = await OptionSetItemModel.findById(itemId);
-    if (!optionItem)
-      throw new NotFoundError('El item no existe o fue eliminado.');
+    if (!optionItem) throw new NotFoundError('El item no existe o fue eliminado.');
 
     if (!optionItem.isEnabled) {
       optionItem.isEnabled = true;
@@ -312,8 +304,7 @@ export async function disabledOptionSetItem(req: Request, res: Response) {
   const { itemId } = req.params;
   try {
     const optionItem = await OptionSetItemModel.findById(itemId);
-    if (!optionItem)
-      throw new NotFoundError('El item no existe o fue eliminado.');
+    if (!optionItem) throw new NotFoundError('El item no existe o fue eliminado.');
 
     if (optionItem.isEnabled) {
       optionItem.isEnabled = false;
@@ -331,8 +322,7 @@ export async function removeImageOfOptionSetItem(req: Request, res: Response) {
 
   try {
     const optionItem = await OptionSetItemModel.findById(itemId);
-    if (!optionItem)
-      throw new NotFoundError('El item no existe o fue eliminado.');
+    if (!optionItem) throw new NotFoundError('El item no existe o fue eliminado.');
 
     if (optionItem.image) {
       await destroyResource(optionItem.image.publicId);
@@ -355,11 +345,8 @@ export async function destroyOptionSetItem(req: Request, res: Response) {
     if (!optionSet) throw new NotFoundError('Set de opciones no encontrado.');
 
     // Se elimina y se recupera el option set item
-    const optionItemDeleted = await OptionSetItemModel.findByIdAndDelete(
-      itemId
-    );
-    if (!optionItemDeleted)
-      throw new NotFoundError('El item no existe o fue eliminado.');
+    const optionItemDeleted = await OptionSetItemModel.findByIdAndDelete(itemId);
+    if (!optionItemDeleted) throw new NotFoundError('El item no existe o fue eliminado.');
 
     // Se elimina la imagen del item eliminado.
     if (optionItemDeleted.image) {
@@ -367,16 +354,11 @@ export async function destroyOptionSetItem(req: Request, res: Response) {
     }
 
     // Se actualiza el arreglo items del set de opciones
-    optionSet.items = optionSet.items.filter(
-      (id) => !optionItemDeleted._id.equals(id)
-    );
+    optionSet.items = optionSet.items.filter((id) => !optionItemDeleted._id.equals(id));
     await optionSet.save({ validateBeforeSave: false });
 
     // Se decrementa el orden de los demas items del set.
-    await OptionSetItemModel.updateMany(
-      { optionSet: optionSet._id },
-      { $inc: { order: -1 } }
-    )
+    await OptionSetItemModel.updateMany({ optionSet: optionSet._id }, { $inc: { order: -1 } })
       .where('order')
       .gt(optionItemDeleted.order);
 

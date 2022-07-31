@@ -23,10 +23,6 @@ router.route('/:productId/update-image').put(formData, updateImage);
 router.route('/:productId/remove-image').delete(removeImage);
 router.route('/:productId/add-view').put(addView);
 
-router
-  .route(
-    '/:productId/option-sets/:productOptionSetId/items/:productOptionItemId'
-  )
-  .put(updateProductOptionItem);
+router.route('/:productId/option-sets/:productOptionSetId/items/:productOptionItemId').put(updateProductOptionItem);
 
 export default router;

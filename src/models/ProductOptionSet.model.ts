@@ -48,11 +48,7 @@ type ProductOptionSetDocumentProps = {
   items: Types.DocumentArray<IOptionItem>;
 };
 
-type ProductOptionModelType = Model<
-  IProductOptionSet,
-  {},
-  ProductOptionSetDocumentProps
->;
+type ProductOptionModelType = Model<IProductOptionSet, {}, ProductOptionSetDocumentProps>;
 
 const schema = new Schema<IProductOptionSet, ProductOptionModelType>(
   {
@@ -91,20 +87,14 @@ const schema = new Schema<IProductOptionSet, ProductOptionModelType>(
   { timestamps: true }
 );
 
-schema.pre(
-  ['remove', 'deleteOne'],
-  { document: true },
-  async function preDeleteOne() {
-    const product = await ProductModel.findById(this.product);
-    if (product) {
-      product.optionSets = product.optionSets.filter(
-        (id) => !this._id.equals(id)
-      );
+schema.pre(['remove', 'deleteOne'], { document: true }, async function preDeleteOne() {
+  const product = await ProductModel.findById(this.product);
+  if (product) {
+    product.optionSets = product.optionSets.filter((id) => !this._id.equals(id));
 
-      await product.save({ validateBeforeSave: false });
-    }
+    await product.save({ validateBeforeSave: false });
   }
-);
+});
 
 schema.pre('findOneAndDelete', async function preQuery() {
   const { _id } = this.getFilter();
@@ -112,16 +102,11 @@ schema.pre('findOneAndDelete', async function preQuery() {
   if (productOptionSet) {
     const product = await ProductModel.findById(productOptionSet.product);
     if (product) {
-      product.optionSets = product.optionSets.filter(
-        (id) => !productOptionSet._id.equals(id)
-      );
+      product.optionSets = product.optionSets.filter((id) => !productOptionSet._id.equals(id));
 
       await product.save({ validateBeforeSave: false });
     }
   }
 });
 
-export default model<IProductOptionSet, ProductOptionModelType>(
-  'ProductOptionSet',
-  schema
-);
+export default model<IProductOptionSet, ProductOptionModelType>('ProductOptionSet', schema);

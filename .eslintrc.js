@@ -20,10 +20,7 @@ module.exports = {
   rules: {
     'prettier/prettier': RULES.ERROR,
     'no-underscore-dangle': RULES.OFF,
-    'no-unused-vars': [
-      RULES.ERROR,
-      { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' },
-    ],
+    'no-unused-vars': [RULES.ERROR, { argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }],
     'import/extensions': [
       RULES.ERROR,
       'ignorePackages',

@@ -33,9 +33,7 @@ export const verify = async (): Promise<boolean> => {
   return false;
 };
 
-export const sendRegisterMail = async (
-  user: IUser
-): Promise<SentMessageInfo | null> => {
+export const sendRegisterMail = async (user: IUser): Promise<SentMessageInfo | null> => {
   const appName = process.env.APP_NAME;
   const body = /* html */ `
   <!DOCTYPE html>

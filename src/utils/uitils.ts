@@ -1,6 +1,5 @@
 export const emailRegex = /^[^@]+@[^@]+.[^@]+$/;
-export const strongPass =
-  /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/;
+export const strongPass = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/;
 
 export interface IImage {
   publicId?: string;

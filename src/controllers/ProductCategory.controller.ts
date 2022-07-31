@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
 import { destroyResource } from '../middlewares/formData';
 import ProductModel from '../models/Product.model';
-import ProductCategoryModel, {
-  IProductCategory,
-} from '../models/ProductCategory.model';
+import ProductCategoryModel, { IProductCategory } from '../models/ProductCategory.model';
 import NotFoundError from '../utils/errors/NotFoundError';
 import sendError from '../utils/sendError';
 import { IImage } from '../utils/uitils';
@@ -161,10 +159,7 @@ export async function destroy(req: Request, res: Response) {
       .updateMany({}, { $inc: { order: -1 } });
 
     // Set undefined in products
-    await ProductModel.updateMany(
-      { category: category._id },
-      { category: undefined }
-    );
+    await ProductModel.updateMany({ category: category._id }, { category: undefined });
 
     res.status(200).json({ ok: true });
   } catch (error) {
@@ -195,9 +190,7 @@ export async function updateImage(req: Request, res: Response) {
 
       res.status(200).json({ ok: true, category });
     } else {
-      res
-        .status(400)
-        .json({ ok: false, message: 'No se pudo actualizar la imagen' });
+      res.status(400).json({ ok: false, message: 'No se pudo actualizar la imagen' });
     }
   } catch (error) {
     const { image }: { image: IImage } = req.body;
@@ -228,9 +221,7 @@ export async function deleteImage(req: Request, res: Response) {
 
       res.status(200).json({ ok: true, category });
     } else {
-      res
-        .status(400)
-        .json({ ok: false, message: 'La categoría no tiene imagen.' });
+      res.status(400).json({ ok: false, message: 'La categoría no tiene imagen.' });
     }
   } catch (error) {
     sendError(error, res);
