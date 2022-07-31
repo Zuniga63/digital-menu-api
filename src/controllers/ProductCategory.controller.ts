@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { destroyResource } from '../middlewares/formData';
+import ProductModel from '../models/Product.model';
 import ProductCategoryModel, {
   IProductCategory,
 } from '../models/ProductCategory.model';
@@ -158,6 +159,12 @@ export async function destroy(req: Request, res: Response) {
     await ProductCategoryModel.where('order')
       .gte(category.order)
       .updateMany({}, { $inc: { order: -1 } });
+
+    // Set undefined in products
+    await ProductModel.updateMany(
+      { category: category._id },
+      { category: undefined }
+    );
 
     res.status(200).json({ ok: true });
   } catch (error) {

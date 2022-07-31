@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { Request, Response } from 'express';
 import { HydratedDocument } from 'mongoose';
 import { destroyResource } from '../middlewares/formData';
@@ -5,6 +6,7 @@ import OptionSetModel, { IOptionSet } from '../models/OptionSet.model';
 import OptionSetItemModel, {
   IOptionSetItem,
 } from '../models/OptionSetItem.model';
+import ProductOptionSetModel from '../models/ProductOptionSet.model';
 import NotFoundError from '../utils/errors/NotFoundError';
 import sendError from '../utils/sendError';
 import { IImage } from '../utils/uitils';
@@ -348,33 +350,67 @@ export async function destroyOptionSetItem(req: Request, res: Response) {
   const { setId, itemId } = req.params;
 
   try {
+    // Se recupera el set de opciones
     const optionSet = await OptionSetModel.findById(setId);
     if (!optionSet) throw new NotFoundError('Set de opciones no encontrado.');
 
-    // Se elimina el item y sus recursos
-    const optionItem = await OptionSetItemModel.findByIdAndDelete(itemId);
-    if (!optionItem)
+    // Se elimina y se recupera el option set item
+    const optionItemDeleted = await OptionSetItemModel.findByIdAndDelete(
+      itemId
+    );
+    if (!optionItemDeleted)
       throw new NotFoundError('El item no existe o fue eliminado.');
 
-    if (optionItem.image) {
-      destroyResource(optionItem.image.publicId);
+    // Se elimina la imagen del item eliminado.
+    if (optionItemDeleted.image) {
+      destroyResource(optionItemDeleted.image.publicId);
     }
 
-    // Se actualiza el set de opciones
+    // Se actualiza el arreglo items del set de opciones
     optionSet.items = optionSet.items.filter(
-      (id) => !optionItem._id.equals(id)
+      (id) => !optionItemDeleted._id.equals(id)
     );
     await optionSet.save({ validateBeforeSave: false });
 
-    // Se actualiza el orden de los demas items
+    // Se decrementa el orden de los demas items del set.
     await OptionSetItemModel.updateMany(
       { optionSet: optionSet._id },
       { $inc: { order: -1 } }
     )
       .where('order')
-      .gt(optionItem.order);
+      .gt(optionItemDeleted.order);
 
-    res.status(200).json({ ok: true, optionItem });
+    // Se recupera los products option sets.
+    const productOptionSets = await ProductOptionSetModel.find({
+      optionSet: optionSet._id,
+    });
+
+    Promise.all(
+      // Se recorre cada product option set para eliminar el item
+      productOptionSets.map(async (productOptionSet) => {
+        // Se recupera el item del product option set a remover.
+        const productOptionItemRemoved = productOptionSet.items.find((item) =>
+          item.optionSetItem.equals(optionItemDeleted._id)
+        );
+
+        if (productOptionItemRemoved) {
+          // Se retira del set.
+          productOptionSet.items.id(productOptionItemRemoved._id)?.remove();
+
+          // Se decrementa el orden de lo item despues del retirado.
+          productOptionSet.items.forEach((item) => {
+            if (item.order > productOptionItemRemoved.order) {
+              item.order -= 1;
+            }
+          });
+
+          // Se actualiza el product option set
+          await productOptionSet.save({ validateBeforeSave: false });
+        }
+      })
+    );
+
+    res.status(200).json({ ok: true, optionItemDeleted });
   } catch (error) {
     sendError(error, res);
   }
