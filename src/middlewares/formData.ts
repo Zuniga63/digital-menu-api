@@ -86,30 +86,20 @@ const formData = (req: Request, _res: Response, next: NextFunction) => {
       // options.public_id = `${name}`;
     }
 
-    const cloud = cloudinary.uploader.upload_stream(
-      options,
-      (cloudErr, cloudRes) => {
-        if (cloudErr) {
-          next(cloudErr);
-        }
-
-        if (cloudRes) {
-          const {
-            public_id: publicId,
-            width,
-            height,
-            format,
-            resource_type: type,
-            secure_url: url,
-          } = cloudRes;
-          body[key] = { publicId, width, height, format, type, url } as IImage;
-        }
-
-        uploadingFile = false;
-        uploadingCount -= 1;
-        done();
+    const cloud = cloudinary.uploader.upload_stream(options, (cloudErr, cloudRes) => {
+      if (cloudErr) {
+        next(cloudErr);
       }
-    );
+
+      if (cloudRes) {
+        const { public_id: publicId, width, height, format, resource_type: type, secure_url: url } = cloudRes;
+        body[key] = { publicId, width, height, format, type, url } as IImage;
+      }
+
+      uploadingFile = false;
+      uploadingCount -= 1;
+      done();
+    });
 
     file.on('data', (data) => {
       cloud.write(data);

@@ -3,14 +3,10 @@ import { HydratedDocument, isValidObjectId } from 'mongoose';
 import { destroyResource } from '../middlewares/formData';
 
 import ProductModel, { IProduct } from '../models/Product.model';
-import ProductOptionSetModel, {
-  IOptionItem,
-} from '../models/ProductOptionSet.model';
+import ProductOptionSetModel, { IOptionItem } from '../models/ProductOptionSet.model';
 import OptionSetModel, { IOptionSet } from '../models/OptionSet.model';
 import OptionSetItemModel from '../models/OptionSetItem.model';
-import ProductCategoryModel, {
-  IProductCategory,
-} from '../models/ProductCategory.model';
+import ProductCategoryModel, { IProductCategory } from '../models/ProductCategory.model';
 
 import NotFoundError from '../utils/errors/NotFoundError';
 import ResponseInfo from '../utils/ResponseInfo';
@@ -98,8 +94,7 @@ export async function store(req: Request, res: Response) {
 
         await Promise.all(
           setIDs.map(async (setId) => {
-            const optionSet: HydratedDocument<IOptionSet> | null =
-              await OptionSetModel.findById(setId);
+            const optionSet: HydratedDocument<IOptionSet> | null = await OptionSetModel.findById(setId);
 
             if (optionSet) {
               const optionItems: IOptionItem[] = [];
@@ -158,16 +153,15 @@ export async function show(req: Request, res: Response) {
   const { slug } = req.params;
   const info = new ResponseInfo();
   try {
-    const product: HydratedDocument<IProduct> | null =
-      await ProductModel.findOne({ slug })
-        .populate('category', 'id name image')
-        .populate({
-          path: 'optionSets',
-          populate: {
-            path: 'items',
-            populate: 'optionSetItem',
-          },
-        });
+    const product: HydratedDocument<IProduct> | null = await ProductModel.findOne({ slug })
+      .populate('category', 'id name image')
+      .populate({
+        path: 'optionSets',
+        populate: {
+          path: 'items',
+          populate: 'optionSetItem',
+        },
+      });
     if (!product) throw new NotFoundError('Producto no encontrado.');
 
     info.product = product;
@@ -229,9 +223,7 @@ export async function update(req: Request, res: Response) {
       const oldCategory = await ProductCategoryModel.findById(product.category);
       if (oldCategory) {
         // Se retira el producto de la categoría
-        oldCategory.products = oldCategory.products.filter(
-          (id) => !product._id.equals(id)
-        );
+        oldCategory.products = oldCategory.products.filter((id) => !product._id.equals(id));
         await oldCategory.save({ validateBeforeSave: false });
       }
 
@@ -279,9 +271,7 @@ export async function destroy(req: Request, res: Response) {
     if (product.category) {
       const category = await ProductCategoryModel.findById(product.category);
       if (category) {
-        category.products = category.products.filter(
-          (id) => !id.equals(product._id)
-        );
+        category.products = category.products.filter((id) => !id.equals(product._id));
 
         await category.save({ validateBeforeSave: false });
       }
@@ -354,13 +344,10 @@ export async function addView(req: Request, res: Response) {
 
 export async function updateProductOptionItem(req: Request, res: Response) {
   const { productOptionSetId, productOptionItemId } = req.params;
-  const { price, published }: { price?: number; published?: boolean } =
-    req.body;
+  const { price, published }: { price?: number; published?: boolean } = req.body;
 
   try {
-    const productOptionSet = await ProductOptionSetModel.findById(
-      productOptionSetId
-    );
+    const productOptionSet = await ProductOptionSetModel.findById(productOptionSetId);
     if (productOptionSet) {
       const optionItem = productOptionSet.items.id(productOptionItemId);
       if (!optionItem) throw new NotFoundError('Item no encontrado.');
