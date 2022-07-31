@@ -5,7 +5,6 @@ export interface IProduct {
   id?: string;
   category?: Types.ObjectId;
   optionSets: Types.ObjectId[];
-  optionSetItems: Types.ObjectId[];
   name: string;
   slug: string;
   description?: string;
@@ -13,7 +12,7 @@ export interface IProduct {
   price: number;
   hasDiscount: boolean;
   priceWithDiscount?: number;
-  isNew: boolean;
+  productIsNew: boolean;
   hasVariant: boolean;
   variantTitle?: string;
   published: boolean;
@@ -39,10 +38,7 @@ const schema = new Schema<IProduct>(
         },
       ],
     },
-    optionSets: [{ type: Schema.Types.ObjectId, ref: 'ProductHasOptionSet' }],
-    optionSetItems: [
-      { type: Schema.Types.ObjectId, ref: 'ProductHasOptionSetItem' },
-    ],
+    optionSets: [{ type: Schema.Types.ObjectId, ref: 'ProductOptionSet' }],
     name: {
       type: String,
       minlength: [3, 'Debe tener minimo 3 caracteres.'],
@@ -82,7 +78,7 @@ const schema = new Schema<IProduct>(
       default: false,
     },
     priceWithDiscount: Number,
-    isNew: {
+    productIsNew: {
       type: Boolean,
       default: false,
     },
@@ -115,6 +111,10 @@ schema.pre('save', function preSave(next) {
   }
 
   next();
+});
+
+schema.virtual('urlSlug').get(function getUrlSlug() {
+  return encodeURIComponent(this.slug);
 });
 
 export default model<IProduct>('Product', schema);
