@@ -13,7 +13,9 @@ export default async function createProductPreset(): Promise<void> {
       auto_tagging: 0.7,
       overwrite: true,
 
-      transformation: [{ width: 480, crop: 'scale' }, { dpr: 'auto' }],
+      transformation: [
+        { width: 1080, crop: 'scale', dpr: 'auto', quality: 'auto:best' },
+      ],
     });
 
     console.log(preset);
