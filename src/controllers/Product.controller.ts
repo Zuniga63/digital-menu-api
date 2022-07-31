@@ -351,3 +351,29 @@ export async function addView(req: Request, res: Response) {
     sendError(error, res);
   }
 }
+
+export async function updateProductOptionItem(req: Request, res: Response) {
+  const { productOptionSetId, productOptionItemId } = req.params;
+  const { price, published }: { price?: number; published?: boolean } =
+    req.body;
+
+  try {
+    const productOptionSet = await ProductOptionSetModel.findById(
+      productOptionSetId
+    );
+    if (productOptionSet) {
+      const optionItem = productOptionSet.items.id(productOptionItemId);
+      if (!optionItem) throw new NotFoundError('Item no encontrado.');
+
+      optionItem.price = price || undefined;
+      optionItem.published = !!published;
+
+      await productOptionSet.save({ validateModifiedOnly: true });
+      res.status(200).json({ ok: true, productOptionSet });
+    } else {
+      throw new NotFoundError('Set de opciones no encontrado.');
+    }
+  } catch (error) {
+    sendError(error, res);
+  }
+}
