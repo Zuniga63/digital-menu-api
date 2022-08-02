@@ -243,3 +243,35 @@ export async function destroyAll(_req: Request, res: Response) {
 
   res.status(200).json({ result });
 }
+
+export async function disabledCategory(req: Request, res: Response) {
+  const { categoryId } = req.params;
+
+  try {
+    const category = await ProductCategoryModel.findById(categoryId);
+    if (!category) throw new NotFoundError('Categoría no encontrada.');
+
+    category.isEnabled = false;
+    await category.save({ validateBeforeSave: false });
+
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    sendError(error, res);
+  }
+}
+
+export async function enabledCategory(req: Request, res: Response) {
+  const { categoryId } = req.params;
+
+  try {
+    const category = await ProductCategoryModel.findById(categoryId);
+    if (!category) throw new NotFoundError('Categoría no encontrada.');
+
+    category.isEnabled = true;
+    await category.save({ validateBeforeSave: false });
+
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    sendError(error, res);
+  }
+}
