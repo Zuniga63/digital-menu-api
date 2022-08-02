@@ -36,10 +36,10 @@ export async function home(_req: Request, res: Response) {
         path: 'products',
         populate: {
           path: 'optionSets',
-          populate: {
-            path: 'items',
-            populate: 'optionSetItem',
-          },
+          populate: 'items.optionSetItem',
+        },
+        options: {
+          sort: { views: 1 },
         },
       });
     res.status(200).json({ ok: true, categories });
