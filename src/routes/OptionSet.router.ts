@@ -31,7 +31,7 @@ router.route('/:setId').delete(destroy);
 
 router.route('/:setId/items').get(listOptionItems);
 router.route('/:setId/items').post(formData, addItem);
-router.route('/:setId/items/:itemId').post(formData, updateOptionSetItem);
+router.route('/:setId/items/:itemId').put(formData, updateOptionSetItem);
 router.route('/:setId/items/:itemId/enabled').put(enabledOptionSetItem);
 router.route('/:setId/items/:itemId/disabled').put(disabledOptionSetItem);
 router.route('/:setId/items/:itemId/remove-image').put(removeImageOfOptionSetItem);
